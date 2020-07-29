@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs/mcdatacreator
+/bin/int
+/bin
+/Debug
+/mcdatacreator/mcdatacreator.vcxproj.user
+/mcdatacreator/Debug
