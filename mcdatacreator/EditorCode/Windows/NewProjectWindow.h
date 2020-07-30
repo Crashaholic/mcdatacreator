@@ -2,12 +2,21 @@
 
 #include <string>
 #include <filesystem>
-#include "Window_NoDock.h"
-#include "WindowElements.h"
+//#include "Builders/Window_NoDock.h"
+#include "Builders/Window_Modal.h"
+#include "Builders/WindowElements.h"
 #include "../DockspaceMenu.h"
+#include "EditorWindow.h"
 
-struct
+struct NewProjectWindow : public EditorWindow
 {
+	NewProjectWindow()
+	{
+		UniqueWindowID = "NewProjectWindow";
+		DisplayWindowName = "New Project";
+		ShowThis = true;
+	}
+
 	std::string NewProjectName;
 	std::string NewProjectNamespace;
 	std::string NewProjectDirectory = std::filesystem::current_path().string();
@@ -19,11 +28,12 @@ struct
 
 	bool ModalEmptyProjectName = false;
 
-	void Show()
+	void Show() override
 	{
 		const char* versionStrings[] = {"1.16.1"};
-		static const char* currentItem = NULL;
-		WindowElements::NoDock::Begin("New Project##NewProjectWindow", &DockspaceMenu.showNewProjectWindow, ImVec2{ 600, 180 });
+
+		WindowElements::Modal::OpenPopup(UniqueWindowID, DisplayWindowName);
+		if (WindowElements::Modal::DoWindow(UniqueWindowID, DisplayWindowName, &ShowThis, ImVec2{ 600, 180 }))
 		{
 			WindowElements::InputText("Project Name", &NewProjectName);
 			WindowElements::InputText("Project Namespace", &NewProjectNamespace);
@@ -39,13 +49,25 @@ struct
 				{
 					ModalEmptyProjectName = true;
 				}
+				else if (NewProjectMCVersion == "Please select a value")
+				{
+					
+				}
+				else if (NewProjectDirectory.empty())
+				{
+
+				}
 				else
 				{
+					ImGui::CloseCurrentPopup();
 					DoCreateNewProject = true;
+					ShowThis = false;
 				}
 			}
+			ImGui::EndPopup();
 		}
-		WindowElements::NoDock::End();
+		ImGui::PopStyleVar();
+
 		if (ModalEmptyProjectName)
 		{
 			ImGui::OpenPopup("Empty Project Name##EmptyProjectNameModal");
@@ -56,11 +78,12 @@ struct
 			ImGui::Text("Project name was empty; Do give a project name.");
 			if (ImGui::Button("OK##EmptyProjectNameModalOk"))
 			{
-				//ErrorWindow.Close();
 				ImGui::CloseCurrentPopup();
 				ModalEmptyProjectName = false;
 			}
 			ImGui::EndPopup();
 		}
+
+
 	}
-} NewProjectWindow;
+} /*NewProjectWindow*/;

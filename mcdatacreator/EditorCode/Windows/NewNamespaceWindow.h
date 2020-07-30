@@ -1,10 +1,11 @@
 #pragma once
 
-#include "WindowElements.h"
-#include "Window_NoDock.h"
+#include "Builders/WindowElements.h"
+#include "Builders/Window_NoDock.h"
 #include "../DockspaceMenu.h"
+#include "EditorWindow.h"
 
-struct
+struct  : EditorWindow
 {
 	std::string NewProjectNamespace;
 
@@ -23,4 +24,4 @@ struct
 		}
 		WindowElements::NoDock::End();
 	}
-} NewNamespaceWindow;
+}NewNamespaceWindow;

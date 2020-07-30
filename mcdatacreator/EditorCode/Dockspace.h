@@ -58,29 +58,6 @@ struct
 			DockspaceMenu.Update();
 		}
 		ImGui::EndMenuBar();
-
-
-		//if (ImGui::DockBuilderGetNode(ImGui::GetID("MyDockspace")) == NULL)
-		//{
-		//	ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
-		//	ImGuiViewport* viewport = ImGui::GetMainViewport();
-		//	ImGui::DockBuilderRemoveNode(dockspace_id); // Clear out existing layout
-		//	ImGui::DockBuilderAddNode(dockspace_id); // Add empty node
-
-		//	ImGuiID dock_main_id = dockspace_id; // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
-		//	ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
-		//	ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, NULL, &dock_main_id);
-		//	ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.20f, NULL, &dock_main_id);
-		//	ImGuiID dock_id_up = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.20f, NULL, &dock_main_id);
-
-		//	//ImGui::DockBuilderDockWindow("Game", dock_main_id);
-		//	//ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-		//	ImGui::DockBuilderFinish(dockspace_id);
-		//}
-
-		//ImGui::DockSpace(ImGui::GetID("MyDockspace"), ImVec2(0.0f, 0.0f), 0);
-
-
 		ImGui::End();
 		// EOF
 	}

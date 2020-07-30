@@ -10,7 +10,8 @@
 #include <filesystem>
 #include <bitset>
 #include "../MCDPProject/MCDatapackProject.hpp"
-#include "../MCDPProject/MCDPProjProperties.h"
+
+#include "WindowStack.h"
 
 #include <json/json.hpp>
 using Json = nlohmann::json;
@@ -37,7 +38,7 @@ public:
 	string currentFileFullName;
 
 	MCDatapackProject currentDatapackProject;
-	MCDPPRojProperties currentMCDPProjProp;
+	WindowStack winStack = WindowStack();
 
 	// Creates the project files
 	// Requires: Project's name and namespace

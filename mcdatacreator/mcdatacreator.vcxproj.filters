@@ -77,9 +77,6 @@
     <ClInclude Include="EditorCode\Windows\NewProjectWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EditorCode\Windows\Window_NoDock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EditorCode\Dockspace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -87,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorCode\Windows\NewNamespaceWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MCDPProject\MCDPProjProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Exceptions\NotImplementedException.h">
@@ -101,13 +95,7 @@
     <ClInclude Include="MCDPProject\MCBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EditorCode\Windows\WindowElements.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EditorCode\Windows\NewMCFunctionWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorCode\Windows\Dockable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorCode\Windows\CurrentMCFunctionWindow.h">
@@ -117,6 +105,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorCode\Windows\CurrentProjectExplorer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\Windows\Builders\Window_Modal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\Windows\Builders\Window_NoDock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\Windows\Builders\WindowElements.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\Windows\Builders\Window_Dockable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\Windows\EditorWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\WindowStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

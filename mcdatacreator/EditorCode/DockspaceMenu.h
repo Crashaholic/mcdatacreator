@@ -55,9 +55,9 @@ struct
 		}
 		if (ImGui::BeginMenu("View"))
 		{
-			if (ImGui::MenuItem("New Scoreboard"))
+			if (ImGui::MenuItem("Project Explorer"))
 			{
-
+				ConstantBools.showProjectExplorer = true;
 			}
 			ImGui::EndMenu();
 		}

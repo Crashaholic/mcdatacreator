@@ -18,6 +18,9 @@ public:
 
 	std::vector<MCFunction> Functions;
 
+	std::string ProjectMCVersion = "Undefined";
+	std::string ProjectMCDPCVersion = "Undefined";
+
 	MCDatapackProject()
 	{
 	}

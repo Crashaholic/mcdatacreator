@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Dockable.h"
-#include "Window_NoDock.h"
+#include "Builders/Window_Dockable.h"
+#include "Builders/Window_NoDock.h"
+#include "Builders/WindowElements.h"
 #include "../../MCDPProject/MCFunction.h"
-#include "WindowElements.h"
 
 #include "ShowWindowBools.h"
 

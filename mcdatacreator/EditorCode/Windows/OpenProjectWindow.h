@@ -1,17 +1,23 @@
 #pragma once
 
-#include "Window_NoDock.h"
-#include "WindowElements.h"
+#include "Builders/Window_NoDock.h"
+#include "Builders/WindowElements.h"
+#include "EditorWindow.h"
 #include "../DockspaceMenu.h"
 
-struct
+struct OpenProjectWindow : EditorWindow
 {
+	OpenProjectWindow()
+	{
+
+	}
 	std::string OpenDirectoryString = "";
 
 	bool DoOpenDir = false;
 
 	void Show()
 	{
+		DockspaceMenu.showOpenProjectWindow = false;
 		WindowElements::NoDock::Begin("Open Project##OpenProjectWindow", &DockspaceMenu.showOpenProjectWindow, {400, 100});
 		{
 			ImGui::Text("Insert a path to the .mcdpproj file");
