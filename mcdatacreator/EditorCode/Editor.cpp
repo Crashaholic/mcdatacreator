@@ -38,8 +38,38 @@ void from_json(const nlohmann::json& j, MCDatapackProject& p)
 	j.at("ProjectName")			.get_to(p.ProjectName);
 }
 
-void Editor::NewProjectCreate(std::string ProjectName, std::string ProjectNamespace, std::string ProjectPath)
+/*
+Returns true if valid.
+Returns false if invalid.
+*/
+bool ValidateNamespace(std::string* string_to_validate)
 {
+	for (size_t i = 0; i < string_to_validate->size(); ++i)
+	{
+		char currChar = (*string_to_validate)[i];
+		if (std::isalpha(currChar))
+		{
+			if (std::isupper(currChar))
+			{
+				return false;
+			}
+		}
+		else if (currChar != '_' && currChar != '-' && !std::isdigit(currChar))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void Editor::NewProjectCreate()
+{
+	auto newProjectData = winStack.get<NewProjectWindow>();
+
+	std::string ProjectPath = newProjectData->NewProjectDirectory;
+	std::string ProjectName = newProjectData->NewProjectName;
+	std::string ProjectNamespace = newProjectData->NewProjectNamespace;
+
 	/*
 		Creates the directory:
 		
@@ -80,6 +110,12 @@ void Editor::NewProjectCreate(std::string ProjectName, std::string ProjectNamesp
 
 	filesys::create_directory(ProjectPath + "/" + ProjectName + "/data/" + ProjectNamespace + "/functions");
 
+	//Validate some inputs first
+	if (!ValidateNamespace(&newProjectData->NewProjectNamespace))
+	{
+		ModalUnimplemented = true;
+		return;
+	}
 
 	filesys::path projectProperties = filesys::path(ProjectPath + "/" + ProjectName + "/" + ProjectName + ".mcdpproj");
 	filesys::path projectMCMeta = filesys::path(ProjectPath + "/" + ProjectName + "/" + "pack" + ".mcmeta");
@@ -96,11 +132,11 @@ void Editor::NewProjectCreate(std::string ProjectName, std::string ProjectNamesp
 	*/
 	// TODO: DO SOMETHING ABOUT PACK FORMAT
 	Json McMetaData;
-	McMetaData["pack"]["description"] = winStack.get<NewProjectWindow>()->NewProjectDescription + " --- Made with MCDataCreator.";
+	McMetaData["pack"]["description"] = newProjectData->NewProjectDescription + " --- Made with MCDataCreator.";
 	
 	int PackFormat = 5;
 	// haha switch cases dont work with c++ strings
-	if (winStack.get<NewProjectWindow>()->NewProjectMCVersion == "1.16.1")
+	if (newProjectData->NewProjectMCVersion == "1.16.1")
 	{
 		PackFormat = 5;
 	}
@@ -108,23 +144,6 @@ void Editor::NewProjectCreate(std::string ProjectName, std::string ProjectNamesp
 	std::ofstream thisMeta(projectMCMeta, std::ios::out);
 	thisMeta << std::setw(4) << McMetaData << '\n';
 	thisMeta.close();
-
-
-	DockspaceMenu.showNewProjectWindow = false;
-	currentDatapackProject = MCDatapackProject();
-
-	currentDatapackProject.ProjectName = ProjectName;
-	currentDatapackProject.ProjectRootDirectory = ProjectPath;
-	currentDatapackProject.ProjectMCVersion = winStack.get<NewProjectWindow>()->NewProjectMCVersion;
-	currentDatapackProject.ProjectMCDPCVersion = "WIP_0.0.1";
-	currentDatapackProject.ProjectDescription = winStack.get<NewProjectWindow>()->NewProjectDescription;
-	currentDatapackProject.Namespaces.push_back("minecraft");
-	currentDatapackProject.Namespaces.push_back(ProjectNamespace);
-
-	Json McProjectData = currentDatapackProject;
-	std::ofstream thisProject(projectProperties, std::ios::out);
-	thisProject << std::setw(4) << McProjectData << '\n';
-	thisProject.close();
 	
 	/*
 		Creates the files:
@@ -176,158 +195,226 @@ void Editor::NewProjectCreate(std::string ProjectName, std::string ProjectNamesp
 	thisMain << '\n';
 	thisMain.close();
 
-	currentDatapackProject.Files.push_back(ProjectPath + "/" + ProjectName + "/data/" + ProjectNamespace + "/functions/" + "init.mcfunction");
-	currentDatapackProject.Files.push_back(ProjectPath + "/" + ProjectName + "/data/" + ProjectNamespace + "/functions/" + "main.mcfunction");
+	currentDatapackProject = MCDatapackProject();
+
+	currentDatapackProject.ProjectName = ProjectName;
+	currentDatapackProject.ProjectRootDirectory = ProjectPath;
+	currentDatapackProject.ProjectMCVersion = newProjectData->NewProjectMCVersion;
+	currentDatapackProject.ProjectMCDPCVersion = "WIP_0.0.1";
+	currentDatapackProject.ProjectDescription = newProjectData->NewProjectDescription;
+	currentDatapackProject.Namespaces.push_back("minecraft");
+	currentDatapackProject.Namespaces.push_back(ProjectNamespace);
+
+	currentDatapackProject.Files.push_back(ProjectName + "/data/" + ProjectNamespace + "/functions/" + "init.mcfunction");
+	currentDatapackProject.Files.push_back(ProjectName + "/data/" + ProjectNamespace + "/functions/" + "main.mcfunction");
 
 	currentDatapackProject.Functions.push_back(MCFunction(ProjectNamespace +":init.mcfunction"));
 	currentDatapackProject.Functions.push_back(MCFunction(ProjectNamespace +":main.mcfunction"));
 
-	winStack.get<NewProjectWindow>()->DoCreateNewProject = false;
-	winStack.get<NewProjectWindow>()->NewProjectDirectory = filesys::current_path().string();
+	Json McProjectData = currentDatapackProject;
+	std::ofstream thisProject(projectProperties, std::ios::out);
+	thisProject << std::setw(4) << McProjectData << '\n';
+	thisProject.close();
 
-	CurrentMCFunctionWindow.showThis = true;
-	CurrentMCFunctionWindow.fileDir = ProjectPath + "/" + ProjectName + "/data/" + ProjectNamespace + "/functions/" + "main.mcfunction";
-	CurrentMCFunctionWindow.fileName = currentDatapackProject.Functions[1].Name;
-	CurrentMCFunctionWindow.referenceToMCFunc = &currentDatapackProject.Functions[1];
+	newProjectData->ShowThis = false;
+
+	glfwSetWindowTitle(_currentWindow, ProjectName.c_str());
 }
 
 void Editor::OpenProject()
 {
-	//if (OpenProjectWindow.OpenDirectoryString.empty())
-	//{
-	//	ModalInvalidProjectDirectory = true;
-	//}
-	//// ATTEMPT OPEN PROJECT
-	//filesys::path currentPath = OpenProjectWindow.OpenDirectoryString;
-	//if (filesys::is_directory(currentPath))
-	//{
-	//	//TODO: SUPPORT ADDING A DIRECTORY
-	//	ModalInvalidProjectDirectory = true;
-	//}
-	//else
-	//{
-	//	Json data;
-	//	std::ifstream inputFile = std::ifstream(OpenProjectWindow.OpenDirectoryString);
-	//	inputFile >> data;
-	//	if (data.contains("projectMCVersion"))
-	//	{
-	//		currentMCDPProjProp = data;
-	//		if (!currentMCDPProjProp.CheckIntegrity())
-	//		{
-	//			ModalInvalidProjectDirectory = true;
-	//		}
-	//		else
-	//		{
-	//			currentDatapackProject.ProjectName = currentMCDPProjProp.projectName;
-	//			currentDatapackProject.Namespaces = currentMCDPProjProp.Namespaces;
-	//			currentDatapackProject.Files = currentMCDPProjProp.Files;
-	//		}
-	//	}
-	//	else
-	//		ModalInvalidProjectDirectory = true;
-	//}
+	auto dataWindow = winStack.get<OpenProjectWindow>();
+
+	if (dataWindow->OpenDirectoryString.empty())
+	{
+		dataWindow->startShowModal_InvalidProjectDirectory = true;
+		dataWindow->DoOpenDir = false;
+		return;
+	}
+
+	if (filesys::exists(dataWindow->OpenDirectoryString))
+	{
+		// ATTEMPT OPEN DIRECTORY
+		if (filesys::is_directory(dataWindow->OpenDirectoryString))
+		{
+			std::cout << "Is Directory!\n";
+			if (filesys::exists(dataWindow->OpenDirectoryString + "/data") && filesys::exists(dataWindow->OpenDirectoryString + "/pack.mcmeta"))
+			{
+				std::cout << "Is Valid Directory!\n";
+				// TODO: CREATE FILE WITH THE DIRECTORY (loop thru, see what's what, where's where)
+				dataWindow->ShowThis = false;
+			}
+			else
+			{
+				dataWindow->startShowModal_InvalidProjectDirectory = true;
+			}
+		}
+		else if (filesys::is_regular_file(dataWindow->OpenDirectoryString))
+		{
+			std::cout << "Is File!\n";
+
+			filesys::path p = dataWindow->OpenDirectoryString;
+			if (p.extension() == ".mcdpproj")
+			{
+				std::ifstream input;
+				input.open(dataWindow->OpenDirectoryString);
+				std::stringstream stream;
+				stream << input.rdbuf();
+				input.close();
+
+				// check to see if input mcdpproj file is defective or not
+				// you never know if the mcdpproj file could just contain absolutely nothing
+
+				std::string dump = stream.str();
+				if (dump.find("ProjectName") == string::npos || dump.find("ProjectMCVersion")  == string::npos || dump.find("ProjectMCDPCVersion") == string::npos || dump.find("ProjectRootDirectory") == string::npos)
+				{
+					std::cout << "bad mcdpproj file!\n";
+					dataWindow->DoOpenDir = false;
+				}
+				else
+				{
+					Json j;
+					stream >> j;
+
+					// checks to see if the given file is valid
+					if (j.contains("ProjectName") && j.contains("ProjectMCVersion") && j.contains("ProjectMCDPCVersion") && j.contains("ProjectRootDirectory"))
+					{
+						std::cout << "valid file!\n";
+
+						// check to see if the given directory matches written directory
+						// if it isnt, change the project's writtent directory to reflect its new location
+						// otherwise leave it as is.
+						string checkPath = j["ProjectRootDirectory"];
+						filesys::path pc = checkPath;
+
+						if (pc.lexically_normal().string() != p.parent_path().parent_path().lexically_normal().string())
+						{
+							j["ProjectRootDirectory"] = p.parent_path().parent_path().string();
+							std::ofstream out;
+							out.open(dataWindow->OpenDirectoryString);
+							out << j;
+							out.close();
+						}
+
+						currentDatapackProject = j;
+						dataWindow->ShowThis = false;
+					}
+					else
+					{
+						std::cout << "invalid file!\n";
+					}
+				}
+			}
+			else
+			{
+				std::cout << "invalid file!\n";
+			}
+		}
+	}
+	else
+	{
+		dataWindow->startShowModal_InvalidProjectDirectory = true;
+	}
+
+	dataWindow->DoOpenDir = false;
 }
 
 void Editor::Update()
 {
+	if (!winStack.get<ToolbarWindow>())
+	{
+		winStack.add<ToolbarWindow>();
+	}
+
 	Dockspace.Update();
+	if (DockspaceMenu.showProjectExplorer)
+	{
+		if (winStack.get<EditorProjectExplorer>())
+		{
+			winStack.get<EditorProjectExplorer>()->currentDatapackProject = &currentDatapackProject;
+		}
+		DockspaceMenu.showProjectExplorer = false;
+	}
 	winStack.check();
 	winStack.show();
+	ImGui::End();
 
-	//currentFileFullName = currentFileName + currentFileExtension;
 	if (DockspaceMenu.appShouldClose)
 	{
 		glfwSetWindowShouldClose(_currentWindow, true);
 	}
 
-	if (DockspaceMenu.showNewProjectWindow)
-	{
-		//winStack.get<NewProjectWindow>()->ShowThis = true;
-		winStack.add<NewProjectWindow>();
-		DockspaceMenu.showNewProjectWindow = false;
-	}
-
 	if (winStack.get<NewProjectWindow>())
 	{
-		//winStack->get<NewProjectWindow>().Show();
 		if (winStack.get<NewProjectWindow>()->DoCreateNewProject)
 		{
-			NewProjectCreate(winStack.get<NewProjectWindow>()->NewProjectName, winStack.get<NewProjectWindow>()->NewProjectNamespace, winStack.get<NewProjectWindow>()->NewProjectDirectory);
+			NewProjectCreate();
 		}
 	}
 
-	if (DockspaceMenu.showNewProjectNamespaceWindow)
+	if (winStack.get<NewNamespaceWindow>())
 	{
-		NewNamespaceWindow.Show();
-		if (NewNamespaceWindow.CreateNewNamespace)
+		auto window = winStack.get<NewNamespaceWindow>();
+		if (window->CreateNewNamespace)
 		{
-			currentDatapackProject.Namespaces.push_back(NewNamespaceWindow.NewProjectNamespace);
+			currentDatapackProject.Namespaces.push_back(window->NewProjectNamespace);
 		}
 	}
 
-	if (DockspaceMenu.showOpenProjectWindow)
+	if (winStack.get<OpenProjectWindow>())
 	{
-		OpenProjectWindow.Show();
-		if (OpenProjectWindow.DoOpenDir)
+		if (winStack.get<OpenProjectWindow>()->DoOpenDir)
 		{
 			OpenProject();
 		}
 	}
 
-	if (CurrentMCFunctionWindow.showThis)
+	if (winStack.get<ToolbarWindow>())
 	{
-		if (CurrentMCFunctionWindow.fileName.empty())
+		auto a = winStack.get<ToolbarWindow>();
+
+		if (a->AttemptSave)
 		{
-			CurrentMCFunctionWindow.referenceToMCFunc = &currentDatapackProject.Functions[1];
-			CurrentMCFunctionWindow.fileName = currentDatapackProject.Functions[1].Name;
-			CurrentMCFunctionWindow.fileDir = currentDatapackProject.Files[1];
+			std::ofstream b;
+			b.open(a->FocussedFile);
+			b << a->contents;
+			b.close();
 		}
-		CurrentMCFunctionWindow.Show();
 	}
 
-	if (ConstantBools.showProjectExplorer)
+	if (winStack.get<EditorProjectExplorer>())
 	{
-		ConstantBools.showProjectExplorer = false;
-		CurrentProjectExplorer.showThis = true;
-		CurrentProjectExplorer.currentDatapackProject = &currentDatapackProject;
-	}
-
-	if (CurrentProjectExplorer.showThis)
-	{
-		CurrentProjectExplorer.Show();
-	}
-
-#pragma region muh modals
-	if (ModalUnimplemented)
-	{
-		ImGui::OpenPopup("Not Implemented##ModalNotImplemented");
-
-		if (ImGui::BeginPopupModal("Not Implemented##ModalNotImplemented", &ModalUnimplemented, ImGuiWindowFlags_AlwaysAutoResize))
+		if (winStack.get<EditorProjectExplorer>()->OpenFile)
 		{
-			ImGui::Text("Whatever you've done, that isn't implemented yet.");
-			if (ImGui::Button("Aw RIP##ModalConfirm"))
+			filesys::path p = winStack.get<EditorProjectExplorer>()->out_selectedFile;
+			if (filesys::exists(p))
 			{
-				ImGui::CloseCurrentPopup();
-				ModalUnimplemented = false;
+				if (p.extension() == ".mcfunction")
+				{
+					bool hasFile = false;
+					size_t index = 0;
+					for (size_t i = 0; i < currentDatapackProject.Functions.size(); ++i)
+					{
+						if (currentDatapackProject.Functions[i].Name.find(p.filename().string()) != string::npos)
+						{
+							hasFile = true;
+							index = i;
+						}
+					}
+					if (hasFile)
+					{
+						auto a = winStack.add<MCFunctionWindow>(p.filename().lexically_normal().string());
+						a->referenceToMCFunc = &currentDatapackProject.Functions[index];
+						a->fileName = p.filename().lexically_normal().string();
+						a->fileDir = winStack.get<EditorProjectExplorer>()->out_selectedFile;
+					}
+				}
 			}
-			ImGui::EndPopup();
-		}
-	}
-
-	if (ModalInvalidProjectDirectory)
-	{
-		ImGui::OpenPopup("Invalid MCDPProject Directory##ModalInvalidProjectDirectory");
-
-		if (ImGui::BeginPopupModal("Invalid MCDPProject Directory##ModalInvalidProjectDirectory", &ModalInvalidProjectDirectory, ImGuiWindowFlags_AlwaysAutoResize))
-		{
-			ImGui::Text("Given directory is not an MCDPProj file!");
-			if (ImGui::Button("OK##ModalConfirm"))
+			else
 			{
-				ImGui::CloseCurrentPopup();
-				ModalInvalidProjectDirectory = false;
+				std::cout << "referenced file does not exist :<\n";
 			}
-			ImGui::EndPopup();
 		}
 	}
-#pragma endregion
+
 }

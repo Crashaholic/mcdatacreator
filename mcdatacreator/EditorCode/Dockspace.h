@@ -16,17 +16,14 @@ struct
 		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 		// because it would be confusing to have two docking targets within each others.
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-		if (opt_fullscreen)
-		{
-			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->Pos);
-			ImGui::SetNextWindowSize(viewport->Size);
-			ImGui::SetNextWindowViewport(viewport->ID);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		}
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->Pos);
+		ImGui::SetNextWindowSize(viewport->Size);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
 		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background 
 		// and handle the pass-thru hole, so we ask Begin() to not render a background.
@@ -40,25 +37,37 @@ struct
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("Docking Space", &dockspaceOpen, window_flags);
-		ImGui::PopStyleVar();
+		ImGui::PopStyleVar(3);
 
-		if (opt_fullscreen)
-			ImGui::PopStyleVar(2);
+		ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+		ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
 
-		// DockSpace
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		if (!ImGui::DockBuilderGetNode(dockspace_id))
 		{
-			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+			ImGui::DockBuilderRemoveNode(dockspace_id);
+			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_None);
+
+			ImGuiID dock_main_id = dockspace_id;
+			ImGuiID dock_up_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.05f, nullptr, &dock_main_id);
+			ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f, nullptr, &dock_main_id);
+
+			ImGui::DockBuilderDockWindow("Toolbar##ToolbarWindow", dock_up_id);
+			ImGui::DockBuilderDockWindow("Project Explorer##EditorProjectExplorer" , dock_right_id);
+
+			// Disable tab bar for custom toolbar
+			ImGuiDockNode* node = ImGui::DockBuilderGetNode(dock_up_id);
+			node->LocalFlags |= ImGuiDockNodeFlags_NoTabBar;
+
+			ImGui::DockBuilderFinish(dock_main_id);
 		}
+
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
 		if (ImGui::BeginMenuBar())
 		{
 			DockspaceMenu.Update();
 		}
 		ImGui::EndMenuBar();
-		ImGui::End();
 		// EOF
 	}
 } Dockspace ;

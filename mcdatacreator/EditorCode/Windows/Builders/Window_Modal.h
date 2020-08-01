@@ -18,7 +18,7 @@ namespace WindowElements
 		bool DoWindow(std::string WindowName, std::string WindowID, bool* show = (bool*)0, ImVec2 MinSize = { 200, 200 })
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, MinSize);
-			return ImGui::BeginPopupModal((WindowName + "##" + WindowID).c_str(), show, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
+			return ImGui::BeginPopupModal((WindowName + "##" + WindowID).c_str(), show, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings);
 		}
 
 		bool DismissButton(std::string ButtonContent, std::string WindowID, bool* ToTurnOff)

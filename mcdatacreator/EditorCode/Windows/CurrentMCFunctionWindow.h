@@ -1,29 +1,44 @@
 #pragma once
 
 #include "Builders/Window_Dockable.h"
-#include "Builders/Window_NoDock.h"
 #include "Builders/WindowElements.h"
 #include "../../MCDPProject/MCFunction.h"
+#include "EditorWindow.h"
 
-#include "ShowWindowBools.h"
-
-struct MCFunctionWindow
+struct MCFunctionWindow : EditorWindow
 {
-	bool showThis = false;
 	MCFunction* referenceToMCFunc = nullptr;
+	bool EditRaw = false;
+
 	std::string fileDir = "";
 	std::string fileName = "";
 	std::string MCVersion = "";
 	
-	void Show()
+	MCFunctionWindow()
 	{
-		if (!referenceToMCFunc || fileName.empty())
+		UniqueWindowID = "Undefined";
+		DisplayWindowName = "Undefined";
+		ShowThis = true;
+	}
+
+	void Show() override
+	{
+		if ((UniqueWindowID == std::string("Undefined") || UniqueWindowID == std::string("Undefined") && DisplayWindowName == std::string("Undefined")) && !fileName.empty())
 		{
-			showThis = false;
+			UniqueWindowID = fileDir.c_str();
+			DisplayWindowName = fileName.c_str();
+			//ShowThis = false;
+			//return;
+		}
+		else if (!referenceToMCFunc || fileName.empty())
+		{
+			ShowThis = false;
 			return;
 		}
-		WindowElements::Dockable::Begin((fileName).c_str(), &showThis);
+		UniqueWindowID = DisplayWindowName = fileName.c_str();
+		WindowElements::Dockable::Begin((fileName).c_str(), UniqueWindowID, &ShowThis);
 		{
+			std::cout << "SHOWING: " << UniqueWindowID << '\n';
 			if (ImGui::Button("Add##MCFuncAddToFunc"))
 			{
 				referenceToMCFunc->Commands.push_back(MCCommand("say hi", MCVersion));
@@ -36,6 +51,8 @@ struct MCFunctionWindow
 			}
 		}
 		WindowElements::Dockable::End();
+		/*
+		TODO: TOOLBAR
 		WindowElements::Dockable::Begin("Real Freakin Jank Right Here", &showThis, {0,0}, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 		{
 			if (ImGui::Button("Save##Internals_Save"))
@@ -47,5 +64,6 @@ struct MCFunctionWindow
 			}
 		}
 		WindowElements::Dockable::End();
+		*/
 	}
-} CurrentMCFunctionWindow;
+};

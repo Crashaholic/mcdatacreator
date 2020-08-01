@@ -125,5 +125,8 @@
     <ClInclude Include="EditorCode\WindowStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EditorCode\Windows\ToolbarWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

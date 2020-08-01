@@ -33,6 +33,24 @@ public:
 			throw new NoNamespacesException(); 
 	}
 
+	// NAMESPACE:ITEM -> DIRECTORY
+	// DEV NOTE: <NAMESPACE> -> <TYPE> -> <ADDITIONAL FOLDERS> -> <ITEM NAME> NO EXTENSIONS!
+	std::string GetFileNameFromNamespacedItem(std::string s)
+	{
+
+	}
+
+	// DIRECTORY -> NAMESPACE:ITEM
+	std::string GetNamespacedItemFromFileName(std::string s)
+	{
+
+	}
+
+	bool empty()
+	{
+		return ProjectName.empty() || ProjectRootDirectory.empty() || ProjectDescription.empty();
+	}
+
 
 private:
 

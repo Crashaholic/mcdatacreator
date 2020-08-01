@@ -113,6 +113,7 @@
     <ClInclude Include="EditorCode\Windows\OpenProjectWindow.h" />
     <ClInclude Include="EditorCode\Windows\Builders\Window_Modal.h" />
     <ClInclude Include="EditorCode\Windows\Builders\Window_NoDock.h" />
+    <ClInclude Include="EditorCode\Windows\ToolbarWindow.h" />
     <ClInclude Include="Exceptions\NotImplementedException.h" />
     <ClInclude Include="MCDPProject\MCBlock.h" />
     <ClInclude Include="MCDPProject\MCCommand.h" />

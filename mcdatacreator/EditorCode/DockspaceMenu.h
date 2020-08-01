@@ -7,6 +7,13 @@
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include "Windows/ShowWindowBools.h"
 
+#include "Windows/OpenProjectWindow.h"
+#include "Windows/NewNamespaceWindow.h"
+#include "Windows/CurrentProjectExplorer.h"
+#include "Windows/NewProjectWindow.h"
+#include "Windows/ToolbarWindow.h"
+#include "WindowStack.h"
+
 struct
 {
 	bool showNewProjectWindow = false;
@@ -15,6 +22,7 @@ struct
 	bool showNewJSONWindow = false;
 	bool showOpenProjectWindow = false;
 	bool showAddFileWindow = false;
+	bool showProjectExplorer = false;
 	bool appShouldClose = false;
 	void Update()
 	{
@@ -22,11 +30,12 @@ struct
 		{
 			if (ImGui::MenuItem("New Project"))
 			{
-				showNewProjectWindow = true;
+				winStack.add<NewProjectWindow>();
+				WindowElements::Modal::OpenPopup(winStack.get<NewProjectWindow>()->DisplayWindowName, winStack.get<NewProjectWindow>()->UniqueWindowID);
 			}
 			if (ImGui::MenuItem("New Namespace"))
 			{
-				showNewProjectNamespaceWindow = true;
+				winStack.add<NewNamespaceWindow>();
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("New MCFunction File"))
@@ -40,7 +49,7 @@ struct
 			ImGui::Separator();
 			if (ImGui::MenuItem("Open Project"))
 			{
-				showOpenProjectWindow = true;
+				winStack.add<OpenProjectWindow>();
 			}
 			if (ImGui::MenuItem("Add File To Project"))
 			{
@@ -57,16 +66,13 @@ struct
 		{
 			if (ImGui::MenuItem("Project Explorer"))
 			{
-				ConstantBools.showProjectExplorer = true;
+				showProjectExplorer = true;
+				winStack.add<EditorProjectExplorer>();
 			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("DEBUG"))
 		{
-			//if (ImGui::MenuItem("Open main mcfunction"))
-			//{
-			//	CurrentMCFunctionWindow.showThis = true;
-			//}
 			ImGui::EndMenu();
 		}
 	}

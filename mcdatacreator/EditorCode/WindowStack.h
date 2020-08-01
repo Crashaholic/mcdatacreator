@@ -74,6 +74,34 @@ struct WindowStack
 		return false;
 	}
 
+	/// Special cases (i.e. Windows I will have a lot of. E.g. Function, crafting, etc..)
+	template <class Window>
+	Window* add(std::string key)
+	{
+		auto temp = get<Window>();
+		if (!temp)
+		{
+			Window* wType = new Window;
+			windows[key] = wType;
+			return wType;
+		}
+		return temp;
+	}
+
+	/// Special cases (i.e. Windows I will have a lot of. E.g. Function, crafting, etc..)
+	template <class Window>
+	Window* get(std::string key)
+	{
+		if (windows.find(key) != windows.end())
+		{
+			EditorWindow* ew = windows[key];
+			if (ew == NULL)
+				return NULL;
+			return static_cast<Window*>(ew);
+		}
+		return nullptr;
+	}
+
 	void show()
 	{
 		for (auto const& [key, val] : windows)
@@ -99,5 +127,5 @@ struct WindowStack
 			this->rem(marked_delete[i]);
 		}
 	}
-};
+}winStack;
 

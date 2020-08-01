@@ -10,10 +10,10 @@ namespace WindowElements
 {
 	namespace Dockable
 	{
-		bool Begin(const char* label, bool* open = (bool*)0, ImVec2 MinWindowSize = ImVec2(300, 300), ImGuiWindowFlags additional_user_flags = (ImGuiWindowFlags)0)
+		bool Begin(const char* display, const char* id, bool* open = (bool*)0, ImVec2 MinWindowSize = ImVec2(300, 300), ImGuiWindowFlags additional_user_flags = (ImGuiWindowFlags)0)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, MinWindowSize);
-			return ImGui::Begin(label, open, additional_user_flags);
+			return ImGui::Begin((std::string(display) + "##" + std::string(id)).c_str(), open, additional_user_flags);
 		}
 
 		void End()

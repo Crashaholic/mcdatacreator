@@ -11,11 +11,10 @@
 #include <bitset>
 #include "../MCDPProject/MCDatapackProject.hpp"
 
-#include "WindowStack.h"
 
 #include <json/json.hpp>
-using Json = nlohmann::json;
 
+using Json = nlohmann::json;
 using string = std::string;
 namespace filesys = std::filesystem;
 
@@ -38,12 +37,9 @@ public:
 	string currentFileFullName;
 
 	MCDatapackProject currentDatapackProject;
-	WindowStack winStack = WindowStack();
 
 	// Creates the project files
-	// Requires: Project's name and namespace
-	// Optional: Project's description
-	void NewProjectCreate(std::string projName, std::string projNamespace, std::string projDescription = "");
+	void NewProjectCreate();
 	void OpenProject();
 	void Update();
 
@@ -51,5 +47,6 @@ private:
 
 	GLFWwindow* _currentWindow;
 	bool ModalUnimplemented = false;
-	bool ModalInvalidProjectDirectory = false;
+	//bool ModalInvalidProjectDirectory = false;
+	bool ModalNamespaceHasUppercase = false;
 };

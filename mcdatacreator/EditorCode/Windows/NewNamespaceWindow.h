@@ -1,27 +1,28 @@
 #pragma once
 
 #include "Builders/WindowElements.h"
-#include "Builders/Window_NoDock.h"
-#include "../DockspaceMenu.h"
+//#include "Builders/Window_NoDock.h"
+#include "Builders/Window_Modal.h"
 #include "EditorWindow.h"
 
-struct  : EditorWindow
+struct NewNamespaceWindow : EditorWindow
 {
+	REGISTER_EDITOR_WINDOW(NewNamespaceWindow, "New Namespace");
 	std::string NewProjectNamespace;
-
 	bool CreateNewNamespace = false;
 
 	void Show()
 	{
-		WindowElements::NoDock::Begin("New Namespace##NewNamespaceWindow", &DockspaceMenu.showNewProjectNamespaceWindow);
+		WindowElements::Modal::OpenPopup(DisplayWindowName, UniqueWindowID);
+		if (WindowElements::Modal::DoWindow(DisplayWindowName, UniqueWindowID, &ShowThis))
 		{
-			WindowElements::InputText("Project Namespace", &NewProjectNamespace);
+			WindowElements::InputText("New Namespace", &NewProjectNamespace);
 			if (ImGui::Button("Create!"))
 			{
 				CreateNewNamespace = true;
-				DockspaceMenu.showNewProjectNamespaceWindow = false;
 			}
+			ImGui::EndPopup();
 		}
-		WindowElements::NoDock::End();
+		ImGui::PopStyleVar();
 	}
-}NewNamespaceWindow;
+};
