@@ -25,6 +25,7 @@ struct OpenProjectWindow : EditorWindow
 			WindowElements::InputText("Path", &OpenDirectoryString);
 			if (ImGui::Button("Open##OpenProjectBtn"))
 			{
+				Messenger::push("OpenProjectDirectory", UniqueWindowID);
 				DoOpenDir = true;
 			}
 

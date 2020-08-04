@@ -38,6 +38,9 @@ public:
 
 	MCDatapackProject currentDatapackProject;
 
+	void ScanDirectory(string s);
+	void ScanDirectory(filesys::path p);
+
 	// Creates the project files
 	void NewProjectCreate();
 	void OpenProject();
@@ -46,7 +49,4 @@ public:
 private:
 
 	GLFWwindow* _currentWindow;
-	bool ModalUnimplemented = false;
-	//bool ModalInvalidProjectDirectory = false;
-	bool ModalNamespaceHasUppercase = false;
 };

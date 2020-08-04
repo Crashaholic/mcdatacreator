@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "MCCommand.h"
+#include "../MCCommand.h"
 
 struct MCFunction
 {

@@ -1,4 +1,9 @@
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <iostream>
@@ -92,23 +97,23 @@ int main()
 		colors[ImGuiCol_PopupBg] =					DARKEN(STYLE_BACKGROUND_COLOUR, 0.25f);
 		colors[ImGuiCol_Border] =					LIGHTEN(STYLE_BACKGROUND_COLOUR, 0.30f);
 		colors[ImGuiCol_BorderShadow] =				ImVec4(0.00f, 0.00f, 0.00f, 0.35f);
-		colors[ImGuiCol_FrameBg] =					DARKEN(STYLE_BACKGROUND_COLOUR, 0.15f);
-		colors[ImGuiCol_FrameBgHovered] =			ImLerp(DARKEN(STYLE_BACKGROUND_COLOUR, 0.15f), STYLE_PRIM_COLOUR, 0.5f);
-		colors[ImGuiCol_FrameBgActive] =			ImLerp(DARKEN(STYLE_BACKGROUND_COLOUR, 0.15f), DARKEN(STYLE_PRIM_COLOUR, 0.2f), 0.5f);
+		colors[ImGuiCol_FrameBg] =					DARKEN(STYLE_BACKGROUND_COLOUR, 0.4f);
+		colors[ImGuiCol_FrameBgHovered] =			ImLerp(DARKEN(STYLE_BACKGROUND_COLOUR, 0.4f), STYLE_PRIM_COLOUR, 0.5f);
+		colors[ImGuiCol_FrameBgActive] =			ImLerp(DARKEN(STYLE_BACKGROUND_COLOUR, 0.4f), DARKEN(STYLE_PRIM_COLOUR, 0.2f), 0.5f);
 		colors[ImGuiCol_TitleBg] =					STYLE_BACKGROUND_COLOUR;
 		colors[ImGuiCol_TitleBgActive] =			LIGHTEN(STYLE_BACKGROUND_COLOUR, 0.15f);
 		colors[ImGuiCol_TitleBgCollapsed] =			ImLerp(STYLE_BACKGROUND_COLOUR, ImVec4(0, 0, 0, 0), 0.35f);
 		colors[ImGuiCol_MenuBarBg] =				STYLE_BACKGROUND_COLOUR;
-		colors[ImGuiCol_ScrollbarBg] =				STYLE_BACKGROUND_COLOUR;
-		colors[ImGuiCol_ScrollbarGrab] =			DARKEN(STYLE_BACKGROUND_COLOUR, 0.3f);
-		colors[ImGuiCol_ScrollbarGrabHovered] =		LIGHTEN(DARKEN(STYLE_BACKGROUND_COLOUR, 0.3f), 0.2f);
-		colors[ImGuiCol_ScrollbarGrabActive] =		DARKEN(DARKEN(STYLE_BACKGROUND_COLOUR, 0.3f), 0.2f);
+		colors[ImGuiCol_ScrollbarBg] =				STYLE_VEC4_COLOUR(0, 0, 0, 0);
+		colors[ImGuiCol_ScrollbarGrab] =			DARKEN(STYLE_BACKGROUND_COLOUR, 0.5f);
+		colors[ImGuiCol_ScrollbarGrabHovered] =		LIGHTEN(DARKEN(STYLE_BACKGROUND_COLOUR, 0.5f), 0.2f);
+		colors[ImGuiCol_ScrollbarGrabActive] =		DARKEN(DARKEN(STYLE_BACKGROUND_COLOUR, 0.5f), 0.2f);
 		colors[ImGuiCol_CheckMark] =				STYLE_TEXT;
 		colors[ImGuiCol_SliderGrab] =				LIGHTEN(STYLE_PRIM_COLOUR, 0.3f);
 		colors[ImGuiCol_SliderGrabActive] =			DARKEN(LIGHTEN(STYLE_PRIM_COLOUR, 0.3f), 0.2f);
-		colors[ImGuiCol_Button] =					ImVec4(0, 0, 0, 0);
+		colors[ImGuiCol_Button] =					ImVec4(0, 0, 0, 0.1f);
 		colors[ImGuiCol_ButtonHovered] =			ImVec4(1, 1, 1, 0.2f);
-		colors[ImGuiCol_ButtonActive] =				ImVec4(0, 0, 0, 0.2f);
+		colors[ImGuiCol_ButtonActive] =				ImVec4(0, 0, 0, 0.4f);
 		colors[ImGuiCol_Header] =					STYLE_BACKGROUND_COLOUR;
 		colors[ImGuiCol_HeaderHovered] =			LIGHTEN(STYLE_BACKGROUND_COLOUR, 0.25f);
 		colors[ImGuiCol_HeaderActive] =				DARKEN(STYLE_BACKGROUND_COLOUR, 0.25f);
@@ -171,4 +176,5 @@ int main()
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
+	_CrtDumpMemoryLeaks();
 }

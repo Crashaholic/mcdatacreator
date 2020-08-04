@@ -7,7 +7,7 @@
 #include "Windows\NewNamespaceWindow.h"
 #include "Windows\OpenProjectWindow.h"
 
-#include "Windows\CurrentMCFunctionWindow.h"
+#include "Windows\MCFunctionWindow.h"
 #include "Windows\CurrentProjectExplorer.h"
 
 #include "Dockspace.h"
@@ -38,35 +38,52 @@ void from_json(const nlohmann::json& j, MCDatapackProject& p)
 	j.at("ProjectName")			.get_to(p.ProjectName);
 }
 
-/*
-Returns true if valid.
-Returns false if invalid.
-*/
-bool ValidateNamespace(std::string* string_to_validate)
+#define NORMAL_LOOKING_STRING lexically_normal().string()
+
+void Editor::ScanDirectory(string s)
 {
-	for (size_t i = 0; i < string_to_validate->size(); ++i)
+	filesys::path p = s;
+	ScanDirectory(p);
+}
+
+void Editor::ScanDirectory(filesys::path p)
+{
+	using recur_dir_iter = filesys::recursive_directory_iterator;
+	std::cout << "Directory contents of " << p.NORMAL_LOOKING_STRING << ": \n\n=====\n";
+	size_t Namespaces = 0;
+	size_t Functions = 0;
+	std::cout << "in this scan, counted:\n";
+	std::string tempCurrentNamespace = "";
+	std::string tempCurrentNamespaceDir = "";
+	for (const auto& dirEntry : recur_dir_iter(p))
 	{
-		char currChar = (*string_to_validate)[i];
-		if (std::isalpha(currChar))
+		std::cout << dirEntry.path().NORMAL_LOOKING_STRING << '\n';
+
+		if (dirEntry.path().NORMAL_LOOKING_STRING.find(".mcfunction") != string::npos)
 		{
-			if (std::isupper(currChar))
-			{
-				return false;
-			}
+			if (tempCurrentNamespace.empty())
+				throw ("item is not in a namespace!");
+
+			Functions++;
 		}
-		else if (currChar != '_' && currChar != '-' && !std::isdigit(currChar))
+		else if (filesys::is_directory(dirEntry.path()) && dirEntry.path().parent_path() == p)
 		{
-			return false;
+			tempCurrentNamespace = dirEntry.path().filename().string();
+			tempCurrentNamespaceDir = dirEntry.path().string();
+			Namespaces++;
 		}
+
 	}
-	return true;
+	std::cout << Namespaces << " namespaces and \n";
+	std::cout << Functions << " functions.\n";
+	std::cout << "=====\n\nEnd of Directory contents. Items are added to the project accordingly\n";
 }
 
 void Editor::NewProjectCreate()
 {
 	auto newProjectData = winStack.get<NewProjectWindow>();
 
-	std::string ProjectPath = newProjectData->NewProjectDirectory;
+	std::string ProjectPath = filesys::path(newProjectData->NewProjectDirectory).NORMAL_LOOKING_STRING; // creating a string from a temporary path here for consistency sake
 	std::string ProjectName = newProjectData->NewProjectName;
 	std::string ProjectNamespace = newProjectData->NewProjectNamespace;
 
@@ -113,7 +130,7 @@ void Editor::NewProjectCreate()
 	//Validate some inputs first
 	if (!ValidateNamespace(&newProjectData->NewProjectNamespace))
 	{
-		ModalUnimplemented = true;
+		//ModalUnimplemented = true;
 		return;
 	}
 
@@ -195,6 +212,7 @@ void Editor::NewProjectCreate()
 	thisMain << '\n';
 	thisMain.close();
 
+	currentDatapackProject.~MCDatapackProject();
 	currentDatapackProject = MCDatapackProject();
 
 	currentDatapackProject.ProjectName = ProjectName;
@@ -218,6 +236,9 @@ void Editor::NewProjectCreate()
 
 	newProjectData->ShowThis = false;
 
+	winStack.add<ToolbarWindow>();
+	winStack.add<EditorProjectExplorer>()->currentDatapackProject = &currentDatapackProject;
+
 	glfwSetWindowTitle(_currentWindow, ProjectName.c_str());
 }
 
@@ -238,10 +259,14 @@ void Editor::OpenProject()
 		if (filesys::is_directory(dataWindow->OpenDirectoryString))
 		{
 			std::cout << "Is Directory!\n";
-			if (filesys::exists(dataWindow->OpenDirectoryString + "/data") && filesys::exists(dataWindow->OpenDirectoryString + "/pack.mcmeta"))
+			if (filesys::exists(dataWindow->OpenDirectoryString + "/data") && filesys::exists(dataWindow->OpenDirectoryString + "/pack.mcmeta") && filesys::exists(dataWindow->OpenDirectoryString + "/data/minecraft"))
 			{
+				currentDatapackProject.~MCDatapackProject();
+				currentDatapackProject = MCDatapackProject();
 				std::cout << "Is Valid Directory!\n";
-				// TODO: CREATE FILE WITH THE DIRECTORY (loop thru, see what's what, where's where)
+				// TODO: CREATE FILE WITH THE DIRECTORY \
+				   SCAN THE DIRECTORY FOR ITS CONTENTS, AUTOMATICALLY CREATE BASED ON IT
+				ScanDirectory(dataWindow->OpenDirectoryString + "/data");
 				dataWindow->ShowThis = false;
 			}
 			else
@@ -282,21 +307,25 @@ void Editor::OpenProject()
 						std::cout << "valid file!\n";
 
 						// check to see if the given directory matches written directory
-						// if it isnt, change the project's writtent directory to reflect its new location
+						// if it isnt, change the project's written directory to reflect its new location
 						// otherwise leave it as is.
 						string checkPath = j["ProjectRootDirectory"];
 						filesys::path pc = checkPath;
 
-						if (pc.lexically_normal().string() != p.parent_path().parent_path().lexically_normal().string())
+						if (pc.NORMAL_LOOKING_STRING != p.parent_path().parent_path().NORMAL_LOOKING_STRING)
 						{
-							j["ProjectRootDirectory"] = p.parent_path().parent_path().string();
+							j["ProjectRootDirectory"] = p.parent_path().parent_path().NORMAL_LOOKING_STRING;
 							std::ofstream out;
 							out.open(dataWindow->OpenDirectoryString);
 							out << j;
 							out.close();
 						}
 
+						currentDatapackProject.~MCDatapackProject();
 						currentDatapackProject = j;
+
+						// TODO: SCAN THE DIRECTORY FOR ITS CONTENTS, AUTOMATICALLY CREATE BASED ON IT
+
 						dataWindow->ShowThis = false;
 					}
 					else
@@ -321,100 +350,103 @@ void Editor::OpenProject()
 
 void Editor::Update()
 {
-	if (!winStack.get<ToolbarWindow>())
-	{
-		winStack.add<ToolbarWindow>();
-	}
 
 	Dockspace.Update();
-	if (DockspaceMenu.showProjectExplorer)
+	if (Messenger::eat("showProjectExplorer"))
 	{
-		if (winStack.get<EditorProjectExplorer>())
-		{
-			winStack.get<EditorProjectExplorer>()->currentDatapackProject = &currentDatapackProject;
-		}
-		DockspaceMenu.showProjectExplorer = false;
+		winStack.get<EditorProjectExplorer>()->currentDatapackProject = &currentDatapackProject;
 	}
 	winStack.check();
 	winStack.show();
-	ImGui::End();
 
 	if (DockspaceMenu.appShouldClose)
 	{
 		glfwSetWindowShouldClose(_currentWindow, true);
 	}
 
-	if (winStack.get<NewProjectWindow>())
+	if (Messenger::eat("DEBUG__SCAN_DIR"))
 	{
-		if (winStack.get<NewProjectWindow>()->DoCreateNewProject)
-		{
-			NewProjectCreate();
-		}
+		ScanDirectory(std::string("C:\\Users\\User\\AppData\\Roaming\\.minecraft\\saves\\Skyblock 4.08.1\\datapacks\\skyblockDatapack\\data"));
 	}
 
-	if (winStack.get<NewNamespaceWindow>())
+	if (Messenger::eat("CreateNewProject"))
+	{
+		NewProjectCreate();
+	}
+	if (Messenger::eat("CreateNewNamespace"))
 	{
 		auto window = winStack.get<NewNamespaceWindow>();
-		if (window->CreateNewNamespace)
-		{
-			currentDatapackProject.Namespaces.push_back(window->NewProjectNamespace);
-		}
+		currentDatapackProject.Namespaces.push_back(window->NewProjectNamespace);
 	}
-
-	if (winStack.get<OpenProjectWindow>())
+	if (Messenger::back().first == "FocusWindow")
 	{
-		if (winStack.get<OpenProjectWindow>()->DoOpenDir)
-		{
-			OpenProject();
-		}
-	}
-
-	if (winStack.get<ToolbarWindow>())
-	{
+		std::string sender = Messenger::back().second;
+		Messenger::pop();
+		std::cout << "manually eating \"FocusWindow\" from " << sender << ". Leftover size is now: " << Messenger::size() << '\n';
 		auto a = winStack.get<ToolbarWindow>();
-
-		if (a->AttemptSave)
+		if (a)
 		{
-			std::ofstream b;
-			b.open(a->FocussedFile);
-			b << a->contents;
-			b.close();
+			a->FocussedFile = sender;
+			if (Messenger::back().first == "IsRawView")
+			{
+				a->RawView = true;
+				Messenger::pop();
+			}
+			else if (Messenger::back().first == "IsNotRawView")
+			{
+				a->RawView = false;
+				Messenger::pop();
+			}
 		}
 	}
-
-	if (winStack.get<EditorProjectExplorer>())
+	if (Messenger::eat("CreateNewNamespace"))
 	{
-		if (winStack.get<EditorProjectExplorer>()->OpenFile)
+		auto window = winStack.get<NewNamespaceWindow>();
+		currentDatapackProject.Namespaces.push_back(window->NewProjectNamespace);
+	}
+
+	if (Messenger::eat("OpenProjectDirectory"))
+	{
+		OpenProject();
+	}
+
+	if (Messenger::eat("SaveAll"))
+	{
+		// TODO: SAVE ALL FILES
+	}
+
+	if (Messenger::eat("OpenProjectExplorerFile"))
+	{
+		filesys::path p = winStack.get<EditorProjectExplorer>()->out_selectedFile;
+		if (filesys::exists(p))
 		{
-			filesys::path p = winStack.get<EditorProjectExplorer>()->out_selectedFile;
-			if (filesys::exists(p))
+			if (p.extension() == ".mcfunction")
 			{
-				if (p.extension() == ".mcfunction")
+				bool hasFile = false;
+				size_t index = 0;
+				for (size_t i = 0; i < currentDatapackProject.Functions.size(); ++i)
 				{
-					bool hasFile = false;
-					size_t index = 0;
-					for (size_t i = 0; i < currentDatapackProject.Functions.size(); ++i)
+					if (currentDatapackProject.Functions[i].Name.find(p.filename().string()) != string::npos)
 					{
-						if (currentDatapackProject.Functions[i].Name.find(p.filename().string()) != string::npos)
-						{
-							hasFile = true;
-							index = i;
-						}
-					}
-					if (hasFile)
-					{
-						auto a = winStack.add<MCFunctionWindow>(p.filename().lexically_normal().string());
-						a->referenceToMCFunc = &currentDatapackProject.Functions[index];
-						a->fileName = p.filename().lexically_normal().string();
-						a->fileDir = winStack.get<EditorProjectExplorer>()->out_selectedFile;
+						hasFile = true;
+						index = i;
 					}
 				}
-			}
-			else
-			{
-				std::cout << "referenced file does not exist :<\n";
+				if (hasFile)
+				{
+					auto a = winStack.add<MCFunctionWindow>(p.filename().lexically_normal().string());
+					a->referenceToMCFunc = &currentDatapackProject.Functions[index];
+					a->fileName = p.filename().lexically_normal().string();
+					a->fileDir = winStack.get<EditorProjectExplorer>()->out_selectedFile;
+				}
 			}
 		}
+		else
+		{
+			std::cout << "referenced file does not exist :<\n";
+		}
 	}
+
+	Messenger::leftovers();
 
 }

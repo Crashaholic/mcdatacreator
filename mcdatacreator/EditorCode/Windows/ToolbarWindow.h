@@ -12,6 +12,7 @@ struct ToolbarWindow : EditorWindow
 	std::string contents = "";
 
 	bool AttemptSave = false;
+	bool RawView = false;
 
 	void Show() override
 	{
@@ -24,7 +25,12 @@ struct ToolbarWindow : EditorWindow
 			}
 			if (ImGui::Button("Save##ToolbarSave"))
 			{
-				AttemptSave = true;
+				Messenger::push("FileAttemptSave", UniqueWindowID);
+			}
+			ImGui::SameLine();
+			if (ImGui::Checkbox("Raw View##ToolbarRawView", &RawView))
+			{
+				Messenger::push(RawView ? "FileShowRawText" : "FileShowPrettyText", FocussedFile);
 			}
 			ImGui::SameLine();
 			if (FocussedFile.empty())

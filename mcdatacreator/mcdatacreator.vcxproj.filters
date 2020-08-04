@@ -47,9 +47,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MCDPProject\MCFunction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Exceptions\NoNamespacesException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -98,9 +95,6 @@
     <ClInclude Include="EditorCode\Windows\NewMCFunctionWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EditorCode\Windows\CurrentMCFunctionWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EditorCode\Windows\ShowWindowBools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -126,6 +120,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorCode\Windows\ToolbarWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\EditorMessenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\Windows\MCFunctionWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MCDPProject\MCData\MCFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCode\Windows\AdvancementsWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MCDPProject\MCData\MCAdvancement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

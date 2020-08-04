@@ -19,8 +19,19 @@ struct NewNamespaceWindow : EditorWindow
 			WindowElements::InputText("New Namespace", &NewProjectNamespace);
 			if (ImGui::Button("Create!"))
 			{
-				CreateNewNamespace = true;
+				if (ValidateNamespace(&NewProjectNamespace))
+				{
+					Messenger::push("CreateNewNamespace", UniqueWindowID);
+				}
+				else
+				{
+					//ImGui::OpenPopup();
+				}
+				//CreateNewNamespace = true;
 			}
+
+			/*TODO: BAD NAMESPACE MODAL*/
+
 			ImGui::EndPopup();
 		}
 		ImGui::PopStyleVar();

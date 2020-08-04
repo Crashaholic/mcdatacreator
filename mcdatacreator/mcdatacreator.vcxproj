@@ -100,8 +100,10 @@
     <ClInclude Include="EditorCode\Dockspace.h" />
     <ClInclude Include="EditorCode\DockspaceMenu.h" />
     <ClInclude Include="EditorCode\Editor.hpp" />
+    <ClInclude Include="EditorCode\EditorMessenger.h" />
     <ClInclude Include="EditorCode\WindowStack.h" />
-    <ClInclude Include="EditorCode\Windows\CurrentMCFunctionWindow.h" />
+    <ClInclude Include="EditorCode\Windows\AdvancementsWindow.h" />
+    <ClInclude Include="EditorCode\Windows\MCFunctionWindow.h" />
     <ClInclude Include="EditorCode\Windows\CurrentProjectExplorer.h" />
     <ClInclude Include="EditorCode\Windows\Builders\Window_Dockable.h" />
     <ClInclude Include="EditorCode\Windows\EditorWindow.h" />
@@ -119,7 +121,8 @@
     <ClInclude Include="MCDPProject\MCCommand.h" />
     <ClInclude Include="Exceptions\NoNamespacesException.h" />
     <ClInclude Include="MCDPProject\MCDatapackProject.hpp" />
-    <ClInclude Include="MCDPProject\MCFunction.h" />
+    <ClInclude Include="MCDPProject\MCData\MCAdvancement.h" />
+    <ClInclude Include="MCDPProject\MCData\MCFunction.h" />
     <ClInclude Include="MCDPProject\MCJsonText.h" />
     <ClInclude Include="MCDPProject\MCScoreboard.h" />
     <ClInclude Include="MCDPProject\MCPosition.h" />

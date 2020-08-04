@@ -41,6 +41,8 @@ struct EditorProjectExplorer : EditorWindow
 						{
 							//TODO: OPEN A DIRECTORY
 						}
+
+						Messenger::push("OpenProjectExplorerFile", UniqueWindowID);
 						OpenFile = true;
 						out_selectedFile = currentDatapackProject->ProjectRootDirectory + "/" + currentDatapackProject->Files[i];
 						Focussed = "";

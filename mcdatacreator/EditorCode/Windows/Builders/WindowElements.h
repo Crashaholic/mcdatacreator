@@ -11,7 +11,7 @@ namespace WindowElements
 {
 	namespace _configuration
 	{
-		float offsetRelativity = 3.f;
+		float offsetRelativity = 4.f;
 	}
 	namespace __privateNameSpace
 	{

@@ -48,15 +48,12 @@ struct
 			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_None);
 
 			ImGuiID dock_main_id = dockspace_id;
-			ImGuiID dock_up_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.05f, nullptr, &dock_main_id);
-			ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f, nullptr, &dock_main_id);
-
-			ImGui::DockBuilderDockWindow("Toolbar##ToolbarWindow", dock_up_id);
-			ImGui::DockBuilderDockWindow("Project Explorer##EditorProjectExplorer" , dock_right_id);
+			//ImGuiID dock_up_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.05f, nullptr, &dock_main_id);
+			//ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f, nullptr, &dock_main_id);
 
 			// Disable tab bar for custom toolbar
-			ImGuiDockNode* node = ImGui::DockBuilderGetNode(dock_up_id);
-			node->LocalFlags |= ImGuiDockNodeFlags_NoTabBar;
+			//ImGuiDockNode* node = ImGui::DockBuilderGetNode(dock_up_id);
+			//node->LocalFlags |= ImGuiDockNodeFlags_NoTabBar;
 
 			ImGui::DockBuilderFinish(dock_main_id);
 		}
@@ -68,6 +65,7 @@ struct
 			DockspaceMenu.Update();
 		}
 		ImGui::EndMenuBar();
+		ImGui::End();
 		// EOF
 	}
 } Dockspace ;

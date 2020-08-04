@@ -16,13 +16,6 @@
 
 struct
 {
-	bool showNewProjectWindow = false;
-	bool showNewProjectNamespaceWindow = false;
-	bool showNewMCFunctionWindow = false;
-	bool showNewJSONWindow = false;
-	bool showOpenProjectWindow = false;
-	bool showAddFileWindow = false;
-	bool showProjectExplorer = false;
 	bool appShouldClose = false;
 	void Update()
 	{
@@ -31,7 +24,6 @@ struct
 			if (ImGui::MenuItem("New Project"))
 			{
 				winStack.add<NewProjectWindow>();
-				WindowElements::Modal::OpenPopup(winStack.get<NewProjectWindow>()->DisplayWindowName, winStack.get<NewProjectWindow>()->UniqueWindowID);
 			}
 			if (ImGui::MenuItem("New Namespace"))
 			{
@@ -40,11 +32,9 @@ struct
 			ImGui::Separator();
 			if (ImGui::MenuItem("New MCFunction File"))
 			{
-				showNewMCFunctionWindow = true;
 			}
 			if (ImGui::MenuItem("New JSON File"))
 			{
-				showNewJSONWindow = true;
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Open Project"))
@@ -53,7 +43,6 @@ struct
 			}
 			if (ImGui::MenuItem("Add File To Project"))
 			{
-				showAddFileWindow = true;
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit"))
@@ -66,13 +55,22 @@ struct
 		{
 			if (ImGui::MenuItem("Project Explorer"))
 			{
-				showProjectExplorer = true;
+				Messenger::push("showProjectExplorer", "");
 				winStack.add<EditorProjectExplorer>();
+			}
+			if (ImGui::MenuItem("Toolbar"))
+			{
+				winStack.add<ToolbarWindow>();
 			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("DEBUG"))
 		{
+			//Messenger::push("token", "value", "sender");
+			if (ImGui::MenuItem("DEBUG__SCAN_DIR"))
+			{
+				Messenger::push("DEBUG__SCAN_DIR", "");
+			}
 			ImGui::EndMenu();
 		}
 	}

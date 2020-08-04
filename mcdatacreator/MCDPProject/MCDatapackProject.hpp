@@ -4,7 +4,7 @@
 #include <string>
 #include "../Exceptions/NoNamespacesException.h"
 #include "../Exceptions/NotImplementedException.h"
-#include "MCFunction.h"
+#include "MCData/MCFunction.h"
 
 class MCDatapackProject
 {

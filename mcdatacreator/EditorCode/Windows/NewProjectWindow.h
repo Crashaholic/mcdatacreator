@@ -27,6 +27,8 @@ struct NewProjectWindow : public EditorWindow
 	bool DoResetDirectoryString = false;
 
 	bool ModalEmptyProjectName = false;
+	bool ModalBadMCVersion = false;
+	bool ModalEmptyProjectDirectory = false;
 
 	void Show() override
 	{
@@ -36,6 +38,7 @@ struct NewProjectWindow : public EditorWindow
 		if (WindowElements::Modal::DoWindow(DisplayWindowName, UniqueWindowID, &ShowThis, ImVec2{ 600, 180 }))
 		{
 			WindowElements::InputText("Project Name", &NewProjectName);
+			ImGui::Button("Random Name");
 			WindowElements::InputText("Project Namespace", &NewProjectNamespace);
 			ImGui::Separator();
 			WindowElements::InputText("Project Path", &NewProjectDirectory);
@@ -50,28 +53,61 @@ struct NewProjectWindow : public EditorWindow
 					ModalEmptyProjectName = true;
 					ImGui::OpenPopup("Empty Project Name##EmptyProjectNameModal");
 				}
+				else if (NewProjectNamespace.empty())
+				{
+
+				}
+				else if (!ValidateNamespace(&NewProjectNamespace))
+				{
+
+				}
 				else if (NewProjectMCVersion == "Please select a value")
 				{
-					
+					ModalBadMCVersion = true;
+					ImGui::OpenPopup("Bad MC Version##BadMCVersionModal");
 				}
 				else if (NewProjectDirectory.empty())
 				{
-
+					ModalEmptyProjectDirectory = true;
+					ImGui::OpenPopup("Empty Project Directory##EmptyProjectDirectoryModal");
 				}
 				else
 				{
 					ImGui::CloseCurrentPopup();
-					DoCreateNewProject = true;
+					//DoCreateNewProject = true;
+					Messenger::push("CreateNewProject", UniqueWindowID);
 				}
 			}
 
-			if (ImGui::BeginPopupModal("Empty Project Name##EmptyProjectNameModal", &ModalEmptyProjectName, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings))
+			if (ImGui::BeginPopupModal("Empty Project Name##EmptyProjectNameModal", &ModalEmptyProjectName, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize))
 			{
-				ImGui::Text("Project name was empty; Do give a project name.");
-				if (ImGui::Button("OK##EmptyProjectNameModalOk"))
+				ImGui::Text("Project name was empty.");
+				if (ImGui::Button("OK##ModalOk"))
 				{
 					ImGui::CloseCurrentPopup();
 					ModalEmptyProjectName = false;
+				}
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::BeginPopupModal("Bad MC Version##BadMCVersionModal", &ModalBadMCVersion, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize))
+			{
+				ImGui::Text("MC Version is not valid.");
+				if (ImGui::Button("OK##ModalOk"))
+				{
+					ImGui::CloseCurrentPopup();
+					ModalBadMCVersion = false;
+				}
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::BeginPopupModal("Empty Project Directory##EmptyProjectDirectoryModal", &ModalEmptyProjectDirectory, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize))
+			{
+				ImGui::Text("Project directory was empty.");
+				if (ImGui::Button("OK##ModalOk"))
+				{
+					ImGui::CloseCurrentPopup();
+					ModalEmptyProjectDirectory = false;
 				}
 				ImGui::EndPopup();
 			}
